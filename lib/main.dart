@@ -4,17 +4,21 @@ import 'package:app_web_ryan_store_app/views/main_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 
-void main() async{
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
-    options: kIsWeb|| Platform.isAndroid? FirebaseOptions(
-        apiKey: 'AIzaSyDI_bitagXxWg3KGvQer49O7H77jdJ1lYo',
-        appId: '1:251688077288:web:7956164f3da2ba2170465d',
-        messagingSenderId: '251688077288',
-        projectId: 'upheld-caldron-465808-c2',
-      storageBucket: 'upheld-caldron-465808-c2.firebasestorage.app',
-    ): null
+    options:
+        kIsWeb || Platform.isAndroid
+            ? FirebaseOptions(
+              apiKey: 'AIzaSyDI_bitagXxWg3KGvQer49O7H77jdJ1lYo',
+              appId: '1:251688077288:web:7956164f3da2ba2170465d',
+              messagingSenderId: '251688077288',
+              projectId: 'upheld-caldron-465808-c2',
+              storageBucket: 'upheld-caldron-465808-c2.firebasestorage.app',
+            )
+            : null,
   );
   runApp(const MyApp());
 }
@@ -46,6 +50,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       home: MainScreen(),
+      builder: EasyLoading.init(),
     );
   }
 }
