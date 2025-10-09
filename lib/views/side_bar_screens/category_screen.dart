@@ -63,87 +63,89 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              alignment: Alignment.topLeft,
-              child: Text(
-                'Categories',
-                style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+    return SingleChildScrollView(
+      child: Form(
+        key: _formKey,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                alignment: Alignment.topLeft,
+                child: Text(
+                  'Categories',
+                  style: TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                ),
               ),
             ),
-          ),
-          Divider(color: Colors.grey),
-          Row(
-            children: [
-              Column(
-                children: [
-                  Container(
-                    height: 140,
-                    width: 150,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade500,
-                      border: Border.all(color: Colors.grey.shade800),
-                      borderRadius: BorderRadius.circular(8),
+            Divider(color: Colors.grey),
+            Row(
+              children: [
+                Column(
+                  children: [
+                    Container(
+                      height: 140,
+                      width: 150,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade500,
+                        border: Border.all(color: Colors.grey.shade800),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Center(
+                        child:
+                            _image != null
+                                ? Image.memory(_image)
+                                : Text(
+                                  'Upload Image',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                      ),
                     ),
-                    child: Center(
-                      child:
-                          _image != null
-                              ? Image.memory(_image)
-                              : Text(
-                                'Upload Image',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
+                    ElevatedButton(
+                      onPressed: () {
+                        pickImage();
+                      },
+                      child: Text(
+                        'Upload Image',
+                        style: TextStyle(color: Colors.white),
+                      ),
                     ),
-                  ),
-                  ElevatedButton(
-                    onPressed: () {
-                      pickImage();
+                  ],
+                ),
+                SizedBox(width: 30),
+                SizedBox(
+                  width: 150,
+                  child: TextFormField(
+                    onChanged: (value) {
+                      categoryName = value;
                     },
-                    child: Text(
-                      'Upload Image',
-                      style: TextStyle(color: Colors.white),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'please enter category name';
+                      } else {
+                        return null;
+                      }
+                    },
+                    decoration: InputDecoration(labelText: 'Category Name'),
+                  ),
+                ),
+                TextButton(
+                  style: ButtonStyle(
+                    side: MaterialStateProperty.all(
+                      BorderSide(color: Colors.blueAccent.shade700),
                     ),
+                    backgroundColor: MaterialStateProperty.all(Colors.white),
                   ),
-                ],
-              ),
-              SizedBox(width: 30),
-              SizedBox(
-                width: 150,
-                child: TextFormField(
-                  onChanged: (value) {
-                    categoryName = value;
+                  onPressed: () {
+                    uploadToFireStore();
                   },
-                  validator: (value) {
-                    if (value!.isEmpty) {
-                      return 'please enter category name';
-                    } else {
-                      return null;
-                    }
-                  },
-                  decoration: InputDecoration(labelText: 'Category Name'),
+                  child: Text('Save'),
                 ),
-              ),
-              TextButton(
-                style: ButtonStyle(
-                  side: MaterialStateProperty.all(
-                    BorderSide(color: Colors.blueAccent.shade700),
-                  ),
-                  backgroundColor: MaterialStateProperty.all(Colors.white),
-                ),
-                onPressed: () {
-                  uploadToFireStore();
-                },
-                child: Text('Save'),
-              ),
-            ],
-          ),
-          CategoryListWidget(),
-        ],
+              ],
+            ),
+            CategoryListWidget(),
+          ],
+        ),
       ),
     );
   }

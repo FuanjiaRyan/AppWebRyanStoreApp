@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class CategoryListWidget extends StatelessWidget {
-  const CategoryListWidget({super.key});
+class BannerListWidget extends StatelessWidget {
+  const BannerListWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final Stream<QuerySnapshot> _categoriesStream =
-        FirebaseFirestore.instance.collection('categories').snapshots();
+    final Stream<QuerySnapshot> _bannersStream =
+        FirebaseFirestore.instance.collection('banners').snapshots();
     return StreamBuilder<QuerySnapshot>(
-      stream: _categoriesStream,
+      stream: _bannersStream,
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
           return Text('Something went wrong');
         }
 
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Center(child: CircularProgressIndicator(),);
+          return Center(child: CircularProgressIndicator());
         }
 
         return GridView.builder(
@@ -31,12 +31,7 @@ class CategoryListWidget extends StatelessWidget {
             final categoryData = snapshot.data!.docs[index];
             return Column(
               children: [
-                Image.network(
-                  categoryData['categoryImage'],
-                  height: 100,
-                  width: 100,
-                ),
-                Text(categoryData['categoryName']),
+                Image.network(categoryData['image'], height: 100, width: 100),
               ],
             );
           },

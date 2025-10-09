@@ -1,3 +1,4 @@
+import 'package:app_web_ryan_store_app/views/side_bar_screens/widgets/banner_list_widget.dart';
 import 'package:app_web_ryan_store_app/views/side_bar_screens/widgets/category_list_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
@@ -120,6 +121,7 @@ class _CategoryScreenState extends State<UploadBannerScreen> {
               ),
             ],
           ),
+          BannerListWidget(),
         ],
       ),
     );
