@@ -2,7 +2,9 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 class ProductScreen extends StatefulWidget {
   static const String id = '\productScreen';
@@ -16,7 +18,9 @@ class ProductScreen extends StatefulWidget {
 class _ProductScreenState extends State<ProductScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _sizeController = TextEditingController();
+  final FirebaseStorage _firebaseStorage = FirebaseStorage.instance;
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
   final List<String> _categoryList = [];
 
   //we will be uploading the values stored in this variables to the cloud firestore
@@ -30,6 +34,7 @@ class _ProductScreenState extends State<ProductScreen> {
 
   bool _isEntered = false;
   final List<Uint8List> _images = [];
+  List<String> _imagesUrls = [];
 
   chooseImage() async {
     final pickedImages = await FilePicker.platform.pickFiles(
@@ -66,6 +71,53 @@ class _ProductScreenState extends State<ProductScreen> {
     super.initState();
   }
 
+  //Upload Product images to storage
+  uploadImageToStorage() async {
+    for (var img in _images) {
+      Reference ref = _firebaseStorage
+          .ref()
+          .child('productImages')
+          .child(Uuid().v4());
+      await ref.putData(img).whenComplete(() async {
+        await ref.getDownloadURL().then((value) {
+          setState(() {
+            _imagesUrls.add(value);
+          });
+        });
+      });
+    }
+  }
+
+  //Function to upload product to cloud
+  uploadData() async {
+    setState(() {
+      _isLoading = true;
+    });
+    await uploadImageToStorage();
+    if (_imagesUrls.isNotEmpty) {
+      final productId = Uuid().v4();
+      await _firestore
+          .collection('products')
+          .doc(productId)
+          .set({
+            'productId': productId,
+            'productName': productName,
+            'productPrice': productPrice,
+            'productSize': _sizeList,
+            'category': selectedCategory,
+            'description': description,
+            'discount': discount,
+            'quantity': quantity,
+            'productImages': _imagesUrls,
+          })
+          .whenComplete(() {
+            setState(() {
+              _isLoading = false;
+            });
+          });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -86,7 +138,7 @@ class _ProductScreenState extends State<ProductScreen> {
                   productName = value;
                 },
                 validator: (value) {
-                  if(value!.isEmpty) {
+                  if (value!.isEmpty) {
                     return 'enter field';
                   } else {
                     return null;
@@ -111,7 +163,7 @@ class _ProductScreenState extends State<ProductScreen> {
                         productPrice = double.parse(value);
                       },
                       validator: (value) {
-                        if(value!.isEmpty) {
+                        if (value!.isEmpty) {
                           return 'enter field';
                         } else {
                           return null;
@@ -138,7 +190,7 @@ class _ProductScreenState extends State<ProductScreen> {
                   discount = int.parse(value);
                 },
                 validator: (value) {
-                  if(value!.isEmpty) {
+                  if (value!.isEmpty) {
                     return 'enter field';
                   } else {
                     return null;
@@ -154,13 +206,13 @@ class _ProductScreenState extends State<ProductScreen> {
                   ),
                 ),
               ),
-              SizedBox(height: 20,),
+              SizedBox(height: 20),
               TextFormField(
                 onChanged: (value) {
                   quantity = int.parse(value);
                 },
                 validator: (value) {
-                  if(value!.isEmpty) {
+                  if (value!.isEmpty) {
                     return 'enter field';
                   } else {
                     return null;
@@ -184,7 +236,7 @@ class _ProductScreenState extends State<ProductScreen> {
                 maxLength: 800,
                 maxLines: 4,
                 validator: (value) {
-                  if(value!.isEmpty) {
+                  if (value!.isEmpty) {
                     return 'enter field';
                   } else {
                     return null;
@@ -306,8 +358,8 @@ class _ProductScreenState extends State<ProductScreen> {
 
               InkWell(
                 onTap: () {
-                  if(_formKey.currentState!.validate()) {
-                    //upload product to cloud firestore
+                  if (_formKey.currentState!.validate()) {
+                    uploadData();
                     print('uploaded');
                   } else {
                     //please fill in all fields
@@ -321,16 +373,19 @@ class _ProductScreenState extends State<ProductScreen> {
                     color: Colors.blueAccent.shade700,
                     borderRadius: BorderRadius.circular(9),
                   ),
-                  child: Center(
-                    child: Text(
-                      'Upload Product',
-                      style: TextStyle(
-                        fontSize: 15,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+                  child:
+                      _isLoading
+                          ? CircularProgressIndicator(color: Colors.white)
+                          : Center(
+                            child: Text(
+                              'Upload Product',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
                 ),
               ),
             ],

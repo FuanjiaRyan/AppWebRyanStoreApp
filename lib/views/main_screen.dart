@@ -16,10 +16,9 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
-
   Widget _selectedScreen = VendorsScreen();
-  screenSelector(item){
-    switch(item.route){
+  screenSelector(item) {
+    switch (item.route) {
       case BuyersScreen.id:
         setState(() {
           _selectedScreen = BuyersScreen();
@@ -52,50 +51,89 @@ class _MainScreenState extends State<MainScreen> {
         break;
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return AdminScaffold(
       appBar: AppBar(
         backgroundColor: Colors.blueAccent,
-        title: Text('Management'),
+        title: Text(
+          'Management',
+          style: TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.white,
+            letterSpacing: 4
+          ),
+        ),
       ),
-        body: _selectedScreen,
+      body: _selectedScreen,
       sideBar: SideBar(
-          items: [
-            AdminMenuItem(
-                title: 'Vendors',
-              route: VendorsScreen.id,
-              icon: CupertinoIcons.person_3,
+        header: Container(
+          height: 50,
+          width: double.infinity,
+          decoration: BoxDecoration(color: Colors.black),
+          child: Center(
+            child: Text(
+              'Multi Vendor Admin',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.7,
+              ),
             ),
-            AdminMenuItem(
-              title: 'Buyers',
-              route: BuyersScreen.id,
-              icon: CupertinoIcons.person,
+          ),
+        ),
+        footer: Container(
+          height: 50,
+          width: double.infinity,
+          color: Colors.black,
+          child: Center(
+            child: Text(
+              'Footer',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.7,
+              ),
             ),
-            AdminMenuItem(
-              title: 'Orders',
-              route: OrdersScreen.id,
-              icon: CupertinoIcons.shopping_cart,
-            ),
-            AdminMenuItem(
-              title: 'Categories',
-              route: CategoryScreen.id,
-              icon: Icons.category,
-            ),
-            AdminMenuItem(
-              title: 'Upload Banners',
-              route: UploadBannerScreen.id,
-              icon: Icons.upload,
-            ),
-            AdminMenuItem(
-              title: 'Products',
-              route: ProductScreen.id,
-              icon: Icons.store,
-            ),
-          ],
-          selectedRoute: VendorsScreen.id,
+          ),
+        ),
+        items: [
+          AdminMenuItem(
+            title: 'Vendors',
+            route: VendorsScreen.id,
+            icon: CupertinoIcons.person_3,
+          ),
+          AdminMenuItem(
+            title: 'Buyers',
+            route: BuyersScreen.id,
+            icon: CupertinoIcons.person,
+          ),
+          AdminMenuItem(
+            title: 'Orders',
+            route: OrdersScreen.id,
+            icon: CupertinoIcons.shopping_cart,
+          ),
+          AdminMenuItem(
+            title: 'Categories',
+            route: CategoryScreen.id,
+            icon: Icons.category,
+          ),
+          AdminMenuItem(
+            title: 'Upload Banners',
+            route: UploadBannerScreen.id,
+            icon: Icons.upload,
+          ),
+          AdminMenuItem(
+            title: 'Products',
+            route: ProductScreen.id,
+            icon: Icons.store,
+          ),
+        ],
+        selectedRoute: VendorsScreen.id,
         onSelected: (item) {
-            screenSelector(item);
+          screenSelector(item);
         },
       ),
     );
