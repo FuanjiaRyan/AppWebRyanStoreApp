@@ -34,7 +34,7 @@ class _ProductScreenState extends State<ProductScreen> {
 
   bool _isEntered = false;
   final List<Uint8List> _images = [];
-  List<String> _imagesUrls = [];
+  final List<String> _imagesUrls = [];
 
   chooseImage() async {
     final pickedImages = await FilePicker.platform.pickFiles(
@@ -113,6 +113,9 @@ class _ProductScreenState extends State<ProductScreen> {
           .whenComplete(() {
             setState(() {
               _isLoading = false;
+              _formKey.currentState!.reset();
+              _imagesUrls.clear();
+              _images.clear();
             });
           });
     }

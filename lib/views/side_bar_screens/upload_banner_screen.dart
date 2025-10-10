@@ -7,7 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_easyloading/flutter_easyloading.dart';
 
 class UploadBannerScreen extends StatefulWidget {
-  static const String id = '\UploadBannerScreen';
+  static const String id = 'UploadBannerScreen';
   const UploadBannerScreen({super.key});
 
   @override
@@ -121,7 +121,7 @@ class _CategoryScreenState extends State<UploadBannerScreen> {
               ),
             ],
           ),
-          BannerListWidget(),
+          const BannerListWidget(),
         ],
       ),
     );
