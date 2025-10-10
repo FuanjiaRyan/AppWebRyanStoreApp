@@ -16,9 +16,18 @@ class ProductScreen extends StatefulWidget {
 class _ProductScreenState extends State<ProductScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _sizeController = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final List<String> _categoryList = [];
+
+  //we will be uploading the values stored in this variables to the cloud firestore
   final List<String> _sizeList = [];
   String? selectedCategory;
+  String? productName;
+  double? productPrice;
+  int? discount;
+  int? quantity;
+  String? description;
+
   bool _isEntered = false;
   final List<Uint8List> _images = [];
 
@@ -62,84 +71,54 @@ class _ProductScreenState extends State<ProductScreen> {
     return SingleChildScrollView(
       child: SizedBox(
         width: 400,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              'Product Information',
-              style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 15),
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Enter Product Name',
-                filled: true,
-                fillColor: Colors.grey.shade200,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
-                ),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Product Information',
+                style: TextStyle(fontSize: 19, fontWeight: FontWeight.bold),
               ),
-            ),
-            SizedBox(height: 20),
-            Row(
-              children: [
-                Flexible(
-                  child: TextFormField(
-                    decoration: InputDecoration(
-                      labelText: 'Enter Price',
-                      filled: true,
-                      fillColor: Colors.grey.shade200,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
+              SizedBox(height: 15),
+              TextFormField(
+                onChanged: (value) {
+                  productName = value;
+                },
+                validator: (value) {
+                  if(value!.isEmpty) {
+                    return 'enter field';
+                  } else {
+                    return null;
+                  }
+                },
+                decoration: InputDecoration(
+                  labelText: 'Enter Product Name',
+                  filled: true,
+                  fillColor: Colors.grey.shade200,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
                   ),
                 ),
-                SizedBox(width: 20),
-                Flexible(child: buildDropDownField()),
-              ],
-            ),
-            SizedBox(height: 20),
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Discount',
-                filled: true,
-                fillColor: Colors.grey.shade200,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
-                ),
               ),
-            ),
-            SizedBox(height: 20),
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Enter Description',
-                filled: true,
-                fillColor: Colors.grey.shade200,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-            SizedBox(height: 20),
-            Row(
-              children: [
-                Flexible(
-                  child: SizedBox(
-                    width: 200,
+              SizedBox(height: 20),
+              Row(
+                children: [
+                  Flexible(
                     child: TextFormField(
-                      controller: _sizeController,
                       onChanged: (value) {
-                        setState(() {
-                          _isEntered = true;
-                        });
+                        productPrice = double.parse(value);
+                      },
+                      validator: (value) {
+                        if(value!.isEmpty) {
+                          return 'enter field';
+                        } else {
+                          return null;
+                        }
                       },
                       decoration: InputDecoration(
-                        labelText: 'Add Size',
+                        labelText: 'Enter Price',
                         filled: true,
                         fillColor: Colors.grey.shade200,
                         border: OutlineInputBorder(
@@ -149,99 +128,213 @@ class _ProductScreenState extends State<ProductScreen> {
                       ),
                     ),
                   ),
+                  SizedBox(width: 20),
+                  Flexible(child: buildDropDownField()),
+                ],
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                onChanged: (value) {
+                  discount = int.parse(value);
+                },
+                validator: (value) {
+                  if(value!.isEmpty) {
+                    return 'enter field';
+                  } else {
+                    return null;
+                  }
+                },
+                decoration: InputDecoration(
+                  labelText: 'Discount',
+                  filled: true,
+                  fillColor: Colors.grey.shade200,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
                 ),
-                SizedBox(width: 10),
-                _isEntered == true
-                    ? Flexible(
-                      child: ElevatedButton(
-                        onPressed: () {
+              ),
+              SizedBox(height: 20,),
+              TextFormField(
+                onChanged: (value) {
+                  quantity = int.parse(value);
+                },
+                validator: (value) {
+                  if(value!.isEmpty) {
+                    return 'enter field';
+                  } else {
+                    return null;
+                  }
+                },
+                decoration: InputDecoration(
+                  labelText: 'Quantity',
+                  filled: true,
+                  fillColor: Colors.grey.shade200,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              TextFormField(
+                onChanged: (value) {
+                  description = value;
+                },
+                maxLength: 800,
+                maxLines: 4,
+                validator: (value) {
+                  if(value!.isEmpty) {
+                    return 'enter field';
+                  } else {
+                    return null;
+                  }
+                },
+                decoration: InputDecoration(
+                  labelText: 'Enter Description',
+                  filled: true,
+                  fillColor: Colors.grey.shade200,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
+                  ),
+                ),
+              ),
+              SizedBox(height: 20),
+              Row(
+                children: [
+                  Flexible(
+                    child: SizedBox(
+                      width: 200,
+                      child: TextFormField(
+                        controller: _sizeController,
+                        onChanged: (value) {
                           setState(() {
-                            _sizeList.add(_sizeController.text);
+                            _isEntered = true;
                           });
                         },
-                        child: Text('Add'),
+                        decoration: InputDecoration(
+                          labelText: 'Add Size',
+                          filled: true,
+                          fillColor: Colors.grey.shade200,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(10),
+                            borderSide: BorderSide.none,
+                          ),
+                        ),
                       ),
-                    )
-                    : Text(''),
-              ],
-            ),
-            _sizeList.isNotEmpty
-                ? Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: SizedBox(
-                    height: 50,
-                    child: ListView.builder(
-                      itemCount: _sizeList.length,
-                      itemBuilder: (context, index) {
-                        return InkWell(
-                          onTap: () {},
-                          child: Container(
-                            decoration: BoxDecoration(
-                              color: Colors.blueAccent.shade700,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  _isEntered == true
+                      ? Flexible(
+                        child: ElevatedButton(
+                          onPressed: () {
+                            setState(() {
+                              _sizeList.add(_sizeController.text);
+                              _sizeController.clear();
+                            });
+                          },
+                          child: Text('Add'),
+                        ),
+                      )
+                      : Text(''),
+                ],
+              ),
+              _sizeList.isNotEmpty
+                  ? Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: SizedBox(
+                      height: 50,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _sizeList.length,
+                        itemBuilder: (context, index) {
+                          return InkWell(
+                            onTap: () {
+                              setState(() {
+                                _sizeList.removeAt(index);
+                              });
+                            },
                             child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Text(
-                                _sizeList[index],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                              padding: const EdgeInsets.all(10.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.blueAccent.shade700,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    _sizeList[index],
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                )
-                : Text(''),
-            SizedBox(height: 20),
-            GridView.builder(
-              itemCount: _images.length + 1,
-              shrinkWrap: true,
-              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-              ),
-              itemBuilder: (context, index) {
-                return index == 0
-                    ? Center(
-                      child: IconButton(
-                        onPressed: () {
-                          chooseImage();
+                          );
                         },
-                        icon: Icon(Icons.add),
                       ),
-                    )
-                    : Image.memory(_images[index - 1]);
-              },
-            ),
-
-            InkWell(
-              onTap: () {},
-              child: Container(
-                width: MediaQuery.of(context).size.width - 50,
-                height: 50,
-                decoration: BoxDecoration(
-                  color: Colors.blueAccent.shade700,
-                  borderRadius: BorderRadius.circular(9),
+                    ),
+                  )
+                  : Text(''),
+              SizedBox(height: 20),
+              GridView.builder(
+                itemCount: _images.length + 1,
+                shrinkWrap: true,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
                 ),
-                child: Center(
-                  child: Text(
-                    'Upload Product',
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                itemBuilder: (context, index) {
+                  return index == 0
+                      ? Center(
+                        child: IconButton(
+                          onPressed: () {
+                            chooseImage();
+                          },
+                          icon: Icon(Icons.add),
+                        ),
+                      )
+                      : Image.memory(_images[index - 1]);
+                },
+              ),
+
+              InkWell(
+                onTap: () {
+                  if(_formKey.currentState!.validate()) {
+                    //upload product to cloud firestore
+                    print('uploaded');
+                  } else {
+                    //please fill in all fields
+                    print('bad status');
+                  }
+                },
+                child: Container(
+                  width: MediaQuery.of(context).size.width - 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent.shade700,
+                    borderRadius: BorderRadius.circular(9),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Upload Product',
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
